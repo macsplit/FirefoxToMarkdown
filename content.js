@@ -27,7 +27,27 @@
                 
     });
 
-    function convertToMarkdown(linkless=false, server_url) {
+    
+
+    function toMarkdownShowSpinner() {        
+        let spinnerCssScript = document.createElement('style');
+        spinnerCssScript.innerHTML = decodeURIComponent(spinnercss);
+        document.head.appendChild(spinnerCssScript);        
+        let toMarkdownLoadingDiv = document.createElement('div');
+        toMarkdownLoadingDiv.setAttribute('id', 'tomarkdownloading');
+        toMarkdownLoadingDiv.setAttribute('class', 'tomarkdownloading');
+        document.body.appendChild(toMarkdownLoadingDiv);
+        toMarkdownLoadingDiv.style.visibility = 'visible';
+    }
+
+    function toMarkdownHideSpinner() {
+        let toMarkdownLoadingDiv = document.getElementById('tomarkdownloading');
+        toMarkdownLoadingDiv.style.visibility = 'hidden';
+        toMarkdownLoadingDiv.remove();
+    }
+
+    function convertToMarkdown(linkless=false, server_url) {        
+
         var request=new XMLHttpRequest();
         if (linkless) {
             server_url += '?links=false';
@@ -38,12 +58,12 @@
         request.onreadystatechange=function()
         {
             if(request.readyState==4&&request.status==200) {
+                toMarkdownHideSpinner();
                     
                 let text = '# ' + decodeURIComponent(request.getResponseHeader('X-Title')) +  '\n' + request.responseText;
                 document.documentElement.innerHTML = "<html><head></head><body><pre><code id='urltomarkdownCodeBlock' class='language-markdown' style='width: 100%; height:100%; white-space: pre-wrap; word-wrap: break-word; font-size:12pt;'></code></pre></body></html>";
-                document.getElementById('urltomarkdownCodeBlock').appendChild(document.createTextNode(text));
+                document.getElementById('urltomarkdownCodeBlock').appendChild(document.createTextNode(text));                
 
-            
                 var cssScript = document.createElement('style');
                 if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
                     document.body.style.backgroundColor = 'black';
@@ -67,7 +87,7 @@
                 newScript4.appendChild(inlineScript4);
                 document.body.appendChild(newScript4);
                 
-                let ctrlDown = false, ctrlKey = 17, cmdKey = 91, cKey = 67;
+                let ctrlDown = false, ctrlKey = 17, cmdKey = 224, cKey = 67;
                 document.body.onkeydown=function(e){                    
                     e.preventDefault();
                     if (e.keyCode == ctrlKey || e.keyCode == cmdKey) ctrlDown = true;
@@ -86,6 +106,7 @@
         html=document.documentElement.innerHTML;
         requestUrl = "html="+encodeURIComponent(html)+"&url="+encodeURIComponent(window.location.href);
         request.send(requestUrl);
+        toMarkdownShowSpinner();
     }
 
     function copySelectedText() {
@@ -112,6 +133,8 @@
             selection.addRange(range);
         }        
     }
+
+    const spinnercss="%2F%2A%20Absolute%20Center%20Spinner%20%2A%2F%0A.tomarkdownloading%20%7B%0A%20%20position%3A%20fixed%3B%0A%20%20z-index%3A%20999%3B%0A%20%20height%3A%202em%3B%0A%20%20width%3A%202em%3B%0A%20%20overflow%3A%20show%3B%0A%20%20margin%3A%20auto%3B%0A%20%20top%3A%200%3B%0A%20%20left%3A%200%3B%0A%20%20bottom%3A%200%3B%0A%20%20right%3A%200%3B%0A%20%20visibility%3A%20hidden%3B%0A%7D%0A%0A%2F%2A%20Transparent%20Overlay%20%2A%2F%0A.tomarkdownloading%3Abefore%20%7B%0A%20%20content%3A%20%27%27%3B%0A%20%20display%3A%20block%3B%0A%20%20position%3A%20fixed%3B%0A%20%20top%3A%200%3B%0A%20%20left%3A%200%3B%0A%20%20width%3A%20100%25%3B%0A%20%20height%3A%20100%25%3B%0A%20%20background-color%3A%20rgba%280%2C0%2C0%2C0.3%29%3B%0A%7D%0A%0A%2F%2A%20%3Anot%28%3Arequired%29%20hides%20these%20rules%20from%20IE9%20and%20below%20%2A%2F%0A.tomarkdownloading%3Anot%28%3Arequired%29%20%7B%0A%20%20%2F%2A%20hide%20%22tomarkdownloading...%22%20text%20%2A%2F%0A%20%20font%3A%200%2F0%20a%3B%0A%20%20color%3A%20transparent%3B%0A%20%20text-shadow%3A%20none%3B%0A%20%20background-color%3A%20transparent%3B%0A%20%20border%3A%200%3B%0A%7D%0A%0A.tomarkdownloading%3Anot%28%3Arequired%29%3Aafter%20%7B%0A%20%20content%3A%20%27%27%3B%0A%20%20display%3A%20block%3B%0A%20%20font-size%3A%2010px%3B%0A%20%20width%3A%201em%3B%0A%20%20height%3A%201em%3B%0A%20%20margin-top%3A%20-0.5em%3B%0A%20%20-webkit-animation%3A%20spinner%201500ms%20infinite%20linear%3B%0A%20%20-moz-animation%3A%20spinner%201500ms%20infinite%20linear%3B%0A%20%20-ms-animation%3A%20spinner%201500ms%20infinite%20linear%3B%0A%20%20-o-animation%3A%20spinner%201500ms%20infinite%20linear%3B%0A%20%20animation%3A%20spinner%201500ms%20infinite%20linear%3B%0A%20%20border-radius%3A%200.5em%3B%0A%20%20-webkit-box-shadow%3A%20rgba%280%2C%200%2C%200%2C%200.75%29%201.5em%200%200%200%2C%20rgba%280%2C%200%2C%200%2C%200.75%29%201.1em%201.1em%200%200%2C%20rgba%280%2C%200%2C%200%2C%200.75%29%200%201.5em%200%200%2C%20rgba%280%2C%200%2C%200%2C%200.75%29%20-1.1em%201.1em%200%200%2C%20rgba%280%2C%200%2C%200%2C%200.5%29%20-1.5em%200%200%200%2C%20rgba%280%2C%200%2C%200%2C%200.5%29%20-1.1em%20-1.1em%200%200%2C%20rgba%280%2C%200%2C%200%2C%200.75%29%200%20-1.5em%200%200%2C%20rgba%280%2C%200%2C%200%2C%200.75%29%201.1em%20-1.1em%200%200%3B%0A%20%20box-shadow%3A%20rgba%280%2C%200%2C%200%2C%200.75%29%201.5em%200%200%200%2C%20rgba%280%2C%200%2C%200%2C%200.75%29%201.1em%201.1em%200%200%2C%20rgba%280%2C%200%2C%200%2C%200.75%29%200%201.5em%200%200%2C%20rgba%280%2C%200%2C%200%2C%200.75%29%20-1.1em%201.1em%200%200%2C%20rgba%280%2C%200%2C%200%2C%200.75%29%20-1.5em%200%200%200%2C%20rgba%280%2C%200%2C%200%2C%200.75%29%20-1.1em%20-1.1em%200%200%2C%20rgba%280%2C%200%2C%200%2C%200.75%29%200%20-1.5em%200%200%2C%20rgba%280%2C%200%2C%200%2C%200.75%29%201.1em%20-1.1em%200%200%3B%0A%7D%0A%0A%2F%2A%20Animation%20%2A%2F%0A%0A%40-webkit-keyframes%20spinner%20%7B%0A%20%200%25%20%7B%0A%20%20%20%20-webkit-transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20-moz-transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20-ms-transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20-o-transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20transform%3A%20rotate%280deg%29%3B%0A%20%20%7D%0A%20%20100%25%20%7B%0A%20%20%20%20-webkit-transform%3A%20rotate%28360deg%29%3B%0A%20%20%20%20-moz-transform%3A%20rotate%28360deg%29%3B%0A%20%20%20%20-ms-transform%3A%20rotate%28360deg%29%3B%0A%20%20%20%20-o-transform%3A%20rotate%28360deg%29%3B%0A%20%20%20%20transform%3A%20rotate%28360deg%29%3B%0A%20%20%7D%0A%7D%0A%40-moz-keyframes%20spinner%20%7B%0A%20%200%25%20%7B%0A%20%20%20%20-webkit-transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20-moz-transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20-ms-transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20-o-transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20transform%3A%20rotate%280deg%29%3B%0A%20%20%7D%0A%20%20100%25%20%7B%0A%20%20%20%20-webkit-transform%3A%20rotate%28360deg%29%3B%0A%20%20%20%20-moz-transform%3A%20rotate%28360deg%29%3B%0A%20%20%20%20-ms-transform%3A%20rotate%28360deg%29%3B%0A%20%20%20%20-o-transform%3A%20rotate%28360deg%29%3B%0A%20%20%20%20transform%3A%20rotate%28360deg%29%3B%0A%20%20%7D%0A%7D%0A%40-o-keyframes%20spinner%20%7B%0A%20%200%25%20%7B%0A%20%20%20%20-webkit-transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20-moz-transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20-ms-transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20-o-transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20transform%3A%20rotate%280deg%29%3B%0A%20%20%7D%0A%20%20100%25%20%7B%0A%20%20%20%20-webkit-transform%3A%20rotate%28360deg%29%3B%0A%20%20%20%20-moz-transform%3A%20rotate%28360deg%29%3B%0A%20%20%20%20-ms-transform%3A%20rotate%28360deg%29%3B%0A%20%20%20%20-o-transform%3A%20rotate%28360deg%29%3B%0A%20%20%20%20transform%3A%20rotate%28360deg%29%3B%0A%20%20%7D%0A%7D%0A%40keyframes%20spinner%20%7B%0A%20%200%25%20%7B%0A%20%20%20%20-webkit-transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20-moz-transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20-ms-transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20-o-transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20transform%3A%20rotate%280deg%29%3B%0A%20%20%7D%0A%20%20100%25%20%7B%0A%20%20%20%20-webkit-transform%3A%20rotate%28360deg%29%3B%0A%20%20%20%20-moz-transform%3A%20rotate%28360deg%29%3B%0A%20%20%20%20-ms-transform%3A%20rotate%28360deg%29%3B%0A%20%20%20%20-o-transform%3A%20rotate%28360deg%29%3B%0A%20%20%20%20transform%3A%20rotate%28360deg%29%3B%0A%20%20%7D%0A%7D%0A";
 
     const markdownjs="%2F*!%20%60markdown%60%20grammar%20compiled%20for%20Highlight.js%2011.5.1%20*%2F%0A(()%3D%3E%7Bvar%20e%3D(()%3D%3E%7B%22use%20strict%22%3Breturn%20e%3D%3E%7Bconst%20n%3D%7Bbegin%3A%2F%3C%5C%2F%3F%5BA-Za-z_%5D%2F%2C%0Aend%3A%22%3E%22%2CsubLanguage%3A%22xml%22%2Crelevance%3A0%7D%2Ca%3D%7Bvariants%3A%5B%7Bbegin%3A%2F%5C%5B.%2B%3F%5C%5D%5C%5B.*%3F%5C%5D%2F%2C%0Arelevance%3A0%7D%2C%7B%0Abegin%3A%2F%5C%5B.%2B%3F%5C%5D%5C(((data%7Cjavascript%7Cmailto)%3A%7C(%3F%3Ahttp%7Cftp)s%3F%3A%5C%2F%5C%2F).*%3F%5C)%2F%2C%0Arelevance%3A2%7D%2C%7B%0Abegin%3Ae.regex.concat(%2F%5C%5B.%2B%3F%5C%5D%5C(%2F%2C%2F%5BA-Za-z%5D%5BA-Za-z0-9%2B.-%5D*%2F%2C%2F%3A%5C%2F%5C%2F.*%3F%5C)%2F)%2C%0Arelevance%3A2%7D%2C%7Bbegin%3A%2F%5C%5B.%2B%3F%5C%5D%5C(%5B.%2F%3F%26%23%5D.*%3F%5C)%2F%2Crelevance%3A1%7D%2C%7B%0Abegin%3A%2F%5C%5B.*%3F%5C%5D%5C(.*%3F%5C)%2F%2Crelevance%3A0%7D%5D%2CreturnBegin%3A!0%2Ccontains%3A%5B%7Bmatch%3A%2F%5C%5B(%3F%3D%5C%5D)%2F%0A%7D%2C%7BclassName%3A%22string%22%2Crelevance%3A0%2Cbegin%3A%22%5C%5C%5B%22%2Cend%3A%22%5C%5C%5D%22%2CexcludeBegin%3A!0%2C%0AreturnEnd%3A!0%7D%2C%7BclassName%3A%22link%22%2Crelevance%3A0%2Cbegin%3A%22%5C%5C%5D%5C%5C(%22%2Cend%3A%22%5C%5C)%22%2C%0AexcludeBegin%3A!0%2CexcludeEnd%3A!0%7D%2C%7BclassName%3A%22symbol%22%2Crelevance%3A0%2Cbegin%3A%22%5C%5C%5D%5C%5C%5B%22%2C%0Aend%3A%22%5C%5C%5D%22%2CexcludeBegin%3A!0%2CexcludeEnd%3A!0%7D%5D%7D%2Ci%3D%7BclassName%3A%22strong%22%2Ccontains%3A%5B%5D%2C%0Avariants%3A%5B%7Bbegin%3A%2F_%7B2%7D%2F%2Cend%3A%2F_%7B2%7D%2F%7D%2C%7Bbegin%3A%2F%5C*%7B2%7D%2F%2Cend%3A%2F%5C*%7B2%7D%2F%7D%5D%7D%2Cs%3D%7B%0AclassName%3A%22emphasis%22%2Ccontains%3A%5B%5D%2Cvariants%3A%5B%7Bbegin%3A%2F%5C*(%3F!%5C*)%2F%2Cend%3A%2F%5C*%2F%7D%2C%7B%0Abegin%3A%2F_(%3F!_)%2F%2Cend%3A%2F_%2F%2Crelevance%3A0%7D%5D%7D%2Cc%3De.inherit(i%2C%7Bcontains%3A%5B%5D%0A%7D)%2Ct%3De.inherit(s%2C%7Bcontains%3A%5B%5D%7D)%3Bi.contains.push(t)%2Cs.contains.push(c)%0A%3Blet%20g%3D%5Bn%2Ca%5D%3Breturn%5Bi%2Cs%2Cc%2Ct%5D.forEach((e%3D%3E%7Be.contains%3De.contains.concat(g)%0A%7D))%2Cg%3Dg.concat(i%2Cs)%2C%7Bname%3A%22Markdown%22%2Caliases%3A%5B%22md%22%2C%22mkdown%22%2C%22mkd%22%5D%2Ccontains%3A%5B%7B%0AclassName%3A%22section%22%2Cvariants%3A%5B%7Bbegin%3A%22%5E%23%7B1%2C6%7D%22%2Cend%3A%22%24%22%2Ccontains%3Ag%7D%2C%7B%0Abegin%3A%22(%3F%3D%5E.%2B%3F%5C%5Cn%5B%3D-%5D%7B2%2C%7D%24)%22%2Ccontains%3A%5B%7Bbegin%3A%22%5E%5B%3D-%5D*%24%22%7D%2C%7Bbegin%3A%22%5E%22%2Cend%3A%22%5C%5Cn%22%2C%0Acontains%3Ag%7D%5D%7D%5D%7D%2Cn%2C%7BclassName%3A%22bullet%22%2Cbegin%3A%22%5E%5B%20%5Ct%5D*(%5B*%2B-%5D%7C(%5C%5Cd%2B%5C%5C.))(%3F%3D%5C%5Cs%2B)%22%2C%0Aend%3A%22%5C%5Cs%2B%22%2CexcludeEnd%3A!0%7D%2Ci%2Cs%2C%7BclassName%3A%22quote%22%2Cbegin%3A%22%5E%3E%5C%5Cs%2B%22%2Ccontains%3Ag%2C%0Aend%3A%22%24%22%7D%2C%7BclassName%3A%22code%22%2Cvariants%3A%5B%7Bbegin%3A%22(%60%7B3%2C%7D)%5B%5E%60%5D(.%7C%5C%5Cn)*%3F%5C%5C1%60*%5B%20%5D*%22%7D%2C%7B%0Abegin%3A%22(~%7B3%2C%7D)%5B%5E~%5D(.%7C%5C%5Cn)*%3F%5C%5C1~*%5B%20%5D*%22%7D%2C%7Bbegin%3A%22%60%60%60%22%2Cend%3A%22%60%60%60%2B%5B%20%5D*%24%22%7D%2C%7B%0Abegin%3A%22~~~%22%2Cend%3A%22~~~%2B%5B%20%5D*%24%22%7D%2C%7Bbegin%3A%22%60.%2B%3F%60%22%7D%2C%7Bbegin%3A%22(%3F%3D%5E(%20%7B4%7D%7C%5C%5Ct))%22%2C%0Acontains%3A%5B%7Bbegin%3A%22%5E(%20%7B4%7D%7C%5C%5Ct)%22%2Cend%3A%22(%5C%5Cn)%24%22%7D%5D%2Crelevance%3A0%7D%5D%7D%2C%7B%0Abegin%3A%22%5E%5B-%5C%5C*%5D%7B3%2C%7D%22%2Cend%3A%22%24%22%7D%2Ca%2C%7Bbegin%3A%2F%5E%5C%5B%5B%5E%5Cn%5D%2B%5C%5D%3A%2F%2CreturnBegin%3A!0%2Ccontains%3A%5B%7B%0AclassName%3A%22symbol%22%2Cbegin%3A%2F%5C%5B%2F%2Cend%3A%2F%5C%5D%2F%2CexcludeBegin%3A!0%2CexcludeEnd%3A!0%7D%2C%7B%0AclassName%3A%22link%22%2Cbegin%3A%2F%3A%5Cs*%2F%2Cend%3A%2F%24%2F%2CexcludeBegin%3A!0%7D%5D%7D%5D%7D%7D%7D)()%0A%3Bhljs.registerLanguage(%22markdown%22%2Ce)%7D)()%3B";
 
