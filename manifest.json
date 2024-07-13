@@ -2,7 +2,7 @@
 
   "manifest_version": 2,
   "name": "ToMarkdown",
-  "version": "1.1",
+  "version": "1.2",  
 
   "description": "Try to generate a markdown version of current webpage.",
 
@@ -18,7 +18,14 @@
 
   "permissions": [
     "activeTab",
+    "storage",
     "<all_urls>"
-  ]
+  ],
+
+  "options_page": "options.html",
+
+  "background": {
+    "scripts": ["background.js"]
+  }
 
 }

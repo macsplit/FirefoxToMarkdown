@@ -96,7 +96,8 @@
                     }
                 };
 
-                document.body.onclick=selectAllTextOnPage;                
+                document.body.onclick=optionallySelectAllTextOnPage;                
+                
             }
             
         };
@@ -119,7 +120,7 @@
         navigator.clipboard.writeText(text);
     }
 
-    function selectAllTextOnPage() {
+    function doSelectAllTextOnPage() {
         document.body.contentEditable = "true";
         if (document.createTextRange) {
             const range = document.createTextRange();
@@ -131,7 +132,19 @@
             range.selectNodeContents(document.body);
             selection.removeAllRanges();
             selection.addRange(range);
-        }        
+        } 
+    }
+
+    function optionallySelectAllTextOnPage() {
+        browser.runtime.sendMessage({
+            action: "getNoAutoSelect"
+        }).then((response) => {
+            if (!response.data) {
+                doSelectAllTextOnPage();
+            }
+        }).catch((err)=> {
+            doSelectAllTextOnPage();
+        });       
     }
 
     const spinnercss="%2F%2A%20Absolute%20Center%20Spinner%20%2A%2F%0A.tomarkdownloading%20%7B%0A%20%20position%3A%20fixed%3B%0A%20%20z-index%3A%20999%3B%0A%20%20height%3A%202em%3B%0A%20%20width%3A%202em%3B%0A%20%20overflow%3A%20show%3B%0A%20%20margin%3A%20auto%3B%0A%20%20top%3A%200%3B%0A%20%20left%3A%200%3B%0A%20%20bottom%3A%200%3B%0A%20%20right%3A%200%3B%0A%20%20visibility%3A%20hidden%3B%0A%7D%0A%0A%2F%2A%20Transparent%20Overlay%20%2A%2F%0A.tomarkdownloading%3Abefore%20%7B%0A%20%20content%3A%20%27%27%3B%0A%20%20display%3A%20block%3B%0A%20%20position%3A%20fixed%3B%0A%20%20top%3A%200%3B%0A%20%20left%3A%200%3B%0A%20%20width%3A%20100%25%3B%0A%20%20height%3A%20100%25%3B%0A%20%20background-color%3A%20rgba%280%2C0%2C0%2C0.3%29%3B%0A%7D%0A%0A%2F%2A%20%3Anot%28%3Arequired%29%20hides%20these%20rules%20from%20IE9%20and%20below%20%2A%2F%0A.tomarkdownloading%3Anot%28%3Arequired%29%20%7B%0A%20%20%2F%2A%20hide%20%22tomarkdownloading...%22%20text%20%2A%2F%0A%20%20font%3A%200%2F0%20a%3B%0A%20%20color%3A%20transparent%3B%0A%20%20text-shadow%3A%20none%3B%0A%20%20background-color%3A%20transparent%3B%0A%20%20border%3A%200%3B%0A%7D%0A%0A.tomarkdownloading%3Anot%28%3Arequired%29%3Aafter%20%7B%0A%20%20content%3A%20%27%27%3B%0A%20%20display%3A%20block%3B%0A%20%20font-size%3A%2010px%3B%0A%20%20width%3A%201em%3B%0A%20%20height%3A%201em%3B%0A%20%20margin-top%3A%20-0.5em%3B%0A%20%20-webkit-animation%3A%20spinner%201500ms%20infinite%20linear%3B%0A%20%20-moz-animation%3A%20spinner%201500ms%20infinite%20linear%3B%0A%20%20-ms-animation%3A%20spinner%201500ms%20infinite%20linear%3B%0A%20%20-o-animation%3A%20spinner%201500ms%20infinite%20linear%3B%0A%20%20animation%3A%20spinner%201500ms%20infinite%20linear%3B%0A%20%20border-radius%3A%200.5em%3B%0A%20%20-webkit-box-shadow%3A%20rgba%280%2C%200%2C%200%2C%200.75%29%201.5em%200%200%200%2C%20rgba%280%2C%200%2C%200%2C%200.75%29%201.1em%201.1em%200%200%2C%20rgba%280%2C%200%2C%200%2C%200.75%29%200%201.5em%200%200%2C%20rgba%280%2C%200%2C%200%2C%200.75%29%20-1.1em%201.1em%200%200%2C%20rgba%280%2C%200%2C%200%2C%200.5%29%20-1.5em%200%200%200%2C%20rgba%280%2C%200%2C%200%2C%200.5%29%20-1.1em%20-1.1em%200%200%2C%20rgba%280%2C%200%2C%200%2C%200.75%29%200%20-1.5em%200%200%2C%20rgba%280%2C%200%2C%200%2C%200.75%29%201.1em%20-1.1em%200%200%3B%0A%20%20box-shadow%3A%20rgba%280%2C%200%2C%200%2C%200.75%29%201.5em%200%200%200%2C%20rgba%280%2C%200%2C%200%2C%200.75%29%201.1em%201.1em%200%200%2C%20rgba%280%2C%200%2C%200%2C%200.75%29%200%201.5em%200%200%2C%20rgba%280%2C%200%2C%200%2C%200.75%29%20-1.1em%201.1em%200%200%2C%20rgba%280%2C%200%2C%200%2C%200.75%29%20-1.5em%200%200%200%2C%20rgba%280%2C%200%2C%200%2C%200.75%29%20-1.1em%20-1.1em%200%200%2C%20rgba%280%2C%200%2C%200%2C%200.75%29%200%20-1.5em%200%200%2C%20rgba%280%2C%200%2C%200%2C%200.75%29%201.1em%20-1.1em%200%200%3B%0A%7D%0A%0A%2F%2A%20Animation%20%2A%2F%0A%0A%40-webkit-keyframes%20spinner%20%7B%0A%20%200%25%20%7B%0A%20%20%20%20-webkit-transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20-moz-transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20-ms-transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20-o-transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20transform%3A%20rotate%280deg%29%3B%0A%20%20%7D%0A%20%20100%25%20%7B%0A%20%20%20%20-webkit-transform%3A%20rotate%28360deg%29%3B%0A%20%20%20%20-moz-transform%3A%20rotate%28360deg%29%3B%0A%20%20%20%20-ms-transform%3A%20rotate%28360deg%29%3B%0A%20%20%20%20-o-transform%3A%20rotate%28360deg%29%3B%0A%20%20%20%20transform%3A%20rotate%28360deg%29%3B%0A%20%20%7D%0A%7D%0A%40-moz-keyframes%20spinner%20%7B%0A%20%200%25%20%7B%0A%20%20%20%20-webkit-transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20-moz-transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20-ms-transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20-o-transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20transform%3A%20rotate%280deg%29%3B%0A%20%20%7D%0A%20%20100%25%20%7B%0A%20%20%20%20-webkit-transform%3A%20rotate%28360deg%29%3B%0A%20%20%20%20-moz-transform%3A%20rotate%28360deg%29%3B%0A%20%20%20%20-ms-transform%3A%20rotate%28360deg%29%3B%0A%20%20%20%20-o-transform%3A%20rotate%28360deg%29%3B%0A%20%20%20%20transform%3A%20rotate%28360deg%29%3B%0A%20%20%7D%0A%7D%0A%40-o-keyframes%20spinner%20%7B%0A%20%200%25%20%7B%0A%20%20%20%20-webkit-transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20-moz-transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20-ms-transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20-o-transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20transform%3A%20rotate%280deg%29%3B%0A%20%20%7D%0A%20%20100%25%20%7B%0A%20%20%20%20-webkit-transform%3A%20rotate%28360deg%29%3B%0A%20%20%20%20-moz-transform%3A%20rotate%28360deg%29%3B%0A%20%20%20%20-ms-transform%3A%20rotate%28360deg%29%3B%0A%20%20%20%20-o-transform%3A%20rotate%28360deg%29%3B%0A%20%20%20%20transform%3A%20rotate%28360deg%29%3B%0A%20%20%7D%0A%7D%0A%40keyframes%20spinner%20%7B%0A%20%200%25%20%7B%0A%20%20%20%20-webkit-transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20-moz-transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20-ms-transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20-o-transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20transform%3A%20rotate%280deg%29%3B%0A%20%20%7D%0A%20%20100%25%20%7B%0A%20%20%20%20-webkit-transform%3A%20rotate%28360deg%29%3B%0A%20%20%20%20-moz-transform%3A%20rotate%28360deg%29%3B%0A%20%20%20%20-ms-transform%3A%20rotate%28360deg%29%3B%0A%20%20%20%20-o-transform%3A%20rotate%28360deg%29%3B%0A%20%20%20%20transform%3A%20rotate%28360deg%29%3B%0A%20%20%7D%0A%7D%0A";

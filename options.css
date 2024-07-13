@@ -1,0 +1,69 @@
+body {
+    font-family: sans-serif;
+    padding: 1em;
+    padding-left: 2em;
+    margin: 0;
+}
+
+:root {
+    --black-4: #5C555D;
+    --grey-2: #f1f1f1;
+
+    --green: rgb(16 192 96);
+
+    --graphical-fg: var(--black-4);
+    --box-bg: var(--grey-2);
+
+    --control-height: 1.1rem;
+    --control-border-width: 1px;
+
+    --3d-highlight: color-mix(in srgb, var(--box-bg) 50%, rgba(241, 241, 241, 0.695));
+    --3d-shadow: color-mix(in srgb, var(--box-bg) 50%, rgba(0, 0, 0, 0.101));
+
+    --concave-item-bg: linear-gradient(180deg, var(--3d-shadow) 12%, var(--3d-highlight) 88%);
+    --convex-item-bg: linear-gradient(180deg, var(--3d-highlight) 0%, var(--3d-shadow) 96%);
+    --concave-item-box-shadow: inset 0px 0px 4px 2px #3838381f;
+
+    --control-bg: var(--grey-1);
+
+    --highlight-color: var(--green);
+    --control-border-color: color-mix(in srgb, var(--graphical-fg) 35%, rgb(0 0 0 / 0%))
+}
+
+input[type='checkbox'] {
+    -webkit-appearance: none !important;
+    border-radius: 50px;
+    appearance: none;
+    background: var(--concave-item-bg);
+    box-shadow: var(--concave-item-box-shadow);
+    border: var(--control-border-width) solid var(--control-border-color);
+    height: var(--control-height);
+    width: calc(var(--control-height) * 1.77);
+    --slider-position: 0px;
+}
+
+input[type='checkbox']:checked {
+    position: relative;
+    --slider-position: calc(var(--control-height) * 0.77);
+}
+
+input[type='checkbox']:checked::before {
+    background: var(--highlight-color);
+}
+
+
+input[type='checkbox']:before {
+    content: "";
+    position: relative;
+    display: inline-block;
+    box-sizing: border-box;
+    border: var(--control-border-width) solid var(--control-border-color);
+    left: var(--slider-position);
+    border-radius: 50px;
+    margin: 0px;
+    padding: 0px;
+    height: calc(var(--control-height) - calc(var(--control-border-width) *2));
+    width: calc(var(--control-height) - calc(var(--control-border-width) *2));
+    background: var(--convex-item-bg);
+    transition: left 0.25s ease, background 0.25s ease;
+}
